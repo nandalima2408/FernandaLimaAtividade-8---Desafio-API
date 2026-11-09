@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja Aurora</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fffde7;
+            color: #e0564c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #fdf0ed;
+            width: 100%;
+            max-width: 480px;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            border: 1px solid #f4c2b9;
+        }
+        .logo-aurora {
+            max-width: 150px;
+            height: auto;
+            margin-bottom: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        h1 {
+            color: #e0564c;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            border: 2px solid #f4c2b9;
+            border-radius: 8px;
+            background-color: #fff9f8;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #e0564c;
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #c9433a;
+        }
+        .resultado-card {
+            margin-top: 20px;
+            padding: 18px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            border-left: 5px solid #e0564c;
+            text-align: left;
+            display: none;
+        }
+        .resultado-card p {
+            margin: 8px 0;
+            color: #444;
+        }
+        .erro {
+            color: #d9534f;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <img src="imagens/logo-aurora.png" alt="Logo Loja Aurora" class="logo-aurora">
+        <h1>Loja Aurora</h1>
+        
+        <input type="text" id="cepInput" placeholder="Digite o CEP (ex: 01001000)" maxlength="8">
+        <button onclick="buscarCep()">Buscar</button>
+
+        <div id="mensagemStatus"></div>
+
+        <div id="resultadoCard" class="resultado-card">
+            <p><strong>Rua:</strong> <span id="rua"></span></p>
+            <p><strong>Bairro:</strong> <span id="bairro"></span></p>
+            <p><strong>Cidade:</strong> <span id="cidade"></span></p>
+            <p><strong>Estado:</strong> <span id="estado"></span></p>
+        </div>
+    </div>
+
+    <script>
+        function buscarCep() {
+            const cep = document.getElementById('cepInput').value.trim();
+            const card = document.getElementById('resultadoCard');
+            const status = document.getElementById('mensagemStatus');
+
+            status.innerHTML = "";
+            card.style.display = "none";
+
+            if (cep.length !== 8 || isNaN(cep)) {
+                status.innerHTML = "<p class='erro'>CEP inválido.</p>";
+                return;
+            }
+
+            status.innerHTML = "<p style='color: #e0564c;'>Consultando...</p>";
+
+            fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                .then(res => res.json())
+                .then(dados => {
+                    status.innerHTML = "";
+                    if (dados.erro) {
+                        status.innerHTML = "<p class='erro'>CEP não encontrado.</p>";
+                        return;
+                    }
+                    document.getElementById('rua').innerText = dados.logradouro || "-";
+                    document.getElementById('bairro').innerText = dados.bairro || "-";
+                    document.getElementById('cidade').innerText = dados.localidade || "-";
+                    document.getElementById('estado').innerText = dados.uf || "-";
+                    card.style.display = "block";
+                })
+                .catch(() => {
+                    status.innerHTML = "<p class='erro'>Erro na consulta.</p>";
+                });
+        }
+    </script>
+
+</body>
+</html>
